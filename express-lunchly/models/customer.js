@@ -1,5 +1,6 @@
 /** Customer for Lunchly */
 
+const res = require("express/lib/response");
 const db = require("../db");
 const Reservation = require("./reservation");
 
@@ -16,7 +17,7 @@ class Customer {
 
     /** Adds a customer */
     fullName() {
-        return `${this.firstName} ${this.lastName}`
+        return `${this.firstName} ${this.lastName}`;
     }
 
     /** find all customers. */
@@ -31,7 +32,14 @@ class Customer {
        FROM customers
        ORDER BY last_name, first_name`
         );
-        return results.rows.map(c => new Customer(c));
+        return results.rows.map((c) => new Customer(c));
+    }
+
+    // /** Search a customer */
+    static async search(lastName, firstName) {
+        const results =
+            await db.query(`SELECT (lastName, firstName) FROM customers WHERE lastName=$1, firstName=$2`, [lastName, firstName]);
+        return res.json(results.rows);
     }
 
     /** get a customer by ID. */
